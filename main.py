@@ -14,10 +14,6 @@ def process(group0_name, group1_name):
     group0_id = client.group(group0_name)['group']['id']
     group1_id = client.group(group1_name)['group']['id']
 
-    ####################################### temp
-    all_users = all_users[0:87]
-
-
     added = []
     removed = []
 
