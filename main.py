@@ -1,6 +1,7 @@
 from client506 import create_client
 from ses import send_simple_email
 import traceback
+from time import sleep
 
 
 def process(group0_name, group1_name):
@@ -29,6 +30,7 @@ def process(group0_name, group1_name):
             if not u['id'] in group1_user_ids:
                 client.add_user_to_group(group1_id, u['id'])
                 added.append(u['username'])
+        sleep(1)
 
     sep = '<br>'
     subject = '%s %s report' % (group0_name, group1_name)
