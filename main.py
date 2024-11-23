@@ -2,6 +2,11 @@ from client506 import create_client
 from ses import send_simple_email
 import traceback
 from time import sleep
+import os
+
+# cd to this dir so it can find api_key
+script_dir = os.path.dirname(os.path.realpath(__file__))
+os.chdir(script_dir)
 
 
 def process(group0_name, group1_name):
