@@ -1,4 +1,6 @@
 from client506 import create_client
+from ses import send_simple_email
+import traceback
 
 
 def process(group0_name, group1_name):
@@ -11,13 +13,50 @@ def process(group0_name, group1_name):
     group1_user_ids = [u['id'] for u in group1_users]
     group0_id = client.group(group0_name)['group']['id']
     group1_id = client.group(group1_name)['group']['id']
+
+    ####################################### temp
+    all_users = all_users[0:87]
+
+
+    added = []
+    removed = []
+
+    # Change memberships only when necessary, so we can log changes
     for u in all_users:
+        # If user is in group0 and group1, remove user from group1
         if u['id'] in group0_user_ids:
             if u['id'] in group1_user_ids:
                 client.delete_group_member(group1_id, u['id'])
+                removed.append(u['username'])
+        # If user is not in group0 and not yet in group1, add user to group1.
         else:
-            client.add_group_members(group1_id, [u['username']])
+            if not u['id'] in group1_user_ids:
+                client.add_user_to_group(group1_id, u['id'])
+                added.append(u['username'])
+
+    sep = '<br>'
+    subject = '%s %s report' % (group0_name, group1_name)
+    text = 'Added to %s:%s' % (group1_name, sep)
+    if added:
+        text += sep.join(added)
+    else:
+        text += '[none]'
+    text += sep
+    text += sep
+    text += 'Removed from %s:%s' % (group1_name, sep)
+    if removed:
+        text += sep.join(removed)
+    else:
+        text += '[none]'
+    send_simple_email('markschmucker@yahoo.com', subject, text)
+    send_simple_email('support@506investorgroup.com', subject, text)
 
 
 if __name__ == '__main__':
-    process('RIA-excluded', 'RIA-included')
+    try:
+        process('RIA-excluded', 'RIA-included')
+    except Exception, exc:
+        print exc
+        send_simple_email('markschmucker@yahoo.com', 'Error in RIA-excluded RIA-included script', traceback.format_exc())
+        send_simple_email('support@506investorgroup.com', 'Error in RIA-excluded RIA-included script', traceback.format_exc())
+
